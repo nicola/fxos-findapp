@@ -28,6 +28,8 @@ function findAppB2G () {
     callback = args[args.length-1];
   }
 
+  if (!opts.client) opts.disconnect = true;
+
   var reloaded =  startB2G(opts)
     .then(function(client) {
       opts.client = client;
@@ -46,6 +48,7 @@ function findAppB2G () {
     return reloaded
       .then(function(styles) {
         if (callback) callback(null, styles);
+        if (opts.disconnect) opts.client.disconnect();
         return styles;
       });
 }
