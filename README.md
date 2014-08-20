@@ -10,6 +10,8 @@ $ npm install --save moz-findapp-b2g
 
 # Usage
 
+The way the library currently finds the app in remote is by finding an app with the same name
+
 ```javascript
 var findApp = require('moz-findapp-b2g');
 

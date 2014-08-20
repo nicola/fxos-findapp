@@ -28,29 +28,38 @@ function findAppB2G () {
     callback = args[args.length-1];
   }
 
-  if (!opts.client) opts.disconnect = true;
-
-  var reloaded =  startB2G(opts)
+  return startB2G(opts)
     .then(function(client) {
       opts.client = client;
 
-      var manifest = getManifest(opts.manifestURL);
+      var manifestJSON = getManifest(opts.manifestURL);
       var webapps = getWebapps(client);
       var apps = webapps.then(getInstalledApps);
 
-      return Q.all([manifest, apps])
-        .spread(findApp)
-        .then(function(app) {
-          return webapps.then(getApp(app.manifestURL));
-        });
-    });
-
-    return reloaded
-      .then(function(styles) {
-        if (callback) callback(null, styles);
-        if (opts.disconnect) opts.client.disconnect();
-        return styles;
+      var appManifest = Q.all([manifestJSON, apps]).spread(findApp);
+      var appActor = appManifest.then(function(app) {
+        return webapps.then(getApp(app.manifestURL));
       });
+
+      var result = Q.allSettled([appManifest, appActor])
+        .spread(function(manifest, actor) {
+
+          var result = {};
+
+          if (actor.state == 'fulfilled') {
+            result = actor.value;
+          }
+
+          result.manifest = manifest.value;
+          return result;
+        });
+
+      return result;
+    })
+    .then(function(styles) {
+      if (callback) callback(null, styles);
+      return styles;
+    });
 }
 
 function getLocalPath(styleActor) {
@@ -60,7 +69,7 @@ function getLocalPath(styleActor) {
 
 function getApp (manifestURL) {
   return function(webapps) {
-    return Q.ninvoke(webapps, 'getApp', manifestURL);
+    return Q.ninvoke(webapps, 'getApp', manifestURL)
   };
 }
 
@@ -94,7 +103,7 @@ if (require.main === module) {
 
     findAppB2G('/Users/mozilla/Desktop/nicola/manifest.webapp', function(err, result){
       console.log("Connected and disconnected", result);
-    });
+    }).done();
 
   })();
 }
