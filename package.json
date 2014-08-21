@@ -1,6 +1,6 @@
 {
   "name": "moz-findapp-b2g",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Find a particular app amongst the installed one in FirefoxOS",
   "main": "index.js",
   "scripts": {
@@ -17,8 +17,8 @@
   },
   "homepage": "https://github.com/nicola/moz-findapp-b2g",
   "dependencies": {
-    "firefox-client": "^0.2.0",
-    "moz-start-b2g": "0.0.6",
+    "firefox-client": "^0.2.1",
+    "moz-start-b2g": "0.0.8",
     "q": "^1.0.1"
   }
 }
