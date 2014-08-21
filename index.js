@@ -41,8 +41,15 @@ function findAppB2G () {
         return webapps.then(getApp(app.manifestURL));
       });
 
+      // Fulfilling the appManifest means that the app is installed
+      // Fulfilling the appActor means that the app is running
       var result = Q.allSettled([appManifest, appActor])
         .spread(function(manifest, actor) {
+
+          // No manifest means no app installed
+          if (manifest.state == 'rejected') {
+            throw manifest.reason;
+          }
 
           var result = {};
 
