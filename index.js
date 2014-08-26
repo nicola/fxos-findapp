@@ -1,34 +1,34 @@
 var Q = require('q');
-var startB2G = require('moz-start-b2g');
+var start = require('fxos-start');
 var FirefoxClient = require('firefox-client');
 var fs = require('fs');
 var path = require('path');
 
-module.exports = findAppB2G;
+module.exports = findApp;
 
-function findAppB2G () {
+function findApp () {
   var args = arguments;
   var opts = {};
   var callback;
 
-  // findAppB2G(manifestURL [, client])
+  // findApp(manifestURL [, client])
   if (typeof args[0] == 'string') {
     opts.manifestURL = args[0];
     if (args[1] instanceof FirefoxClient) {
       opts.client = args[1];
     }
   }
-  // findAppB2G({manifestURL: manifest_path[, client: firefox_client]})
+  // findApp({manifestURL: manifest_path[, client: firefox_client]})
   else if (typeof args[0] == 'object') {
     opts = args[0];
   }
 
-  // findAppB2G(..., callback)
+  // findApp(..., callback)
   if (typeof args[args.length-1] == 'function') {
     callback = args[args.length-1];
   }
 
-  return startB2G(opts)
+  return start(opts)
     .then(function(client) {
       opts.client = client;
 
@@ -76,7 +76,7 @@ function getLocalPath(styleActor) {
 
 function getApp (manifestURL) {
   return function(webapps) {
-    return Q.ninvoke(webapps, 'getApp', manifestURL)
+    return Q.ninvoke(webapps, 'getApp', manifestURL);
   };
 }
 
@@ -108,7 +108,7 @@ function findApp(manifest, apps) {
 if (require.main === module) {
   (function() {
 
-    findAppB2G('/Users/mozilla/Desktop/nicola/manifest.webapp', function(err, result){
+    findApp('/Users/mozilla/Desktop/nicola/manifest.webapp', function(err, result){
       console.log("Connected and disconnected", result);
     }).done();
 
