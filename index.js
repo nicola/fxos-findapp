@@ -36,7 +36,7 @@ function findApp () {
       var webapps = getWebapps(client);
       var apps = webapps.then(getInstalledApps);
 
-      var appManifest = Q.all([manifestJSON, apps]).spread(findApp);
+      var appManifest = Q.all([manifestJSON, apps]).spread(findAppManifest);
       var appActor = appManifest.then(function(app) {
         return webapps.then(getApp(app.manifestURL));
       });
@@ -95,7 +95,7 @@ function getManifest(manifestURL) {
     });
 }
 
-function findApp(manifest, apps) {
+function findAppManifest(manifest, apps) {
   for (var i=0; i < apps.length; i++) {
     var app = apps[i];
     if (app.name == manifest.name) {
