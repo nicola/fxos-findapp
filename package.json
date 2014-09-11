@@ -8,17 +8,29 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/nicola/moz-findapp-b2g.git"
+    "url": "https://github.com/nicola/fxos-findapp.git"
   },
   "author": "Nicola Greco <me@nicola.io> (http://nicolagreco.com/)",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/nicola/moz-findapp-b2g/issues"
+    "url": "https://github.com/nicola/fxos-findapp/issues"
   },
-  "homepage": "https://github.com/nicola/moz-findapp-b2g",
+  "homepage": "https://github.com/nicola/fxos-findapp",
   "dependencies": {
+    "clone": "^0.1.18",
     "firefox-client": "^0.2.3",
+    "fxos-connect": "^0.1.0",
     "fxos-start": "^0.1.0",
-    "q": "^1.0.1"
+    "q": "^1.0.1",
+    "underscore": "^1.7.0"
+  },
+  "keywords": [
+    "webapps",
+    "b2g",
+    "firefoxos",
+    "fxos"
+  ],
+  "devDependencies": {
+    "should": "^4.0.4"
   }
 }

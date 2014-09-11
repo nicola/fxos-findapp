@@ -1,8 +1,9 @@
 var Q = require('q');
-var start = require('fxos-start');
+var Connect = require('fxos-connect');
 var FirefoxClient = require('firefox-client');
 var fs = require('fs');
 var path = require('path');
+var __ = require('underscore');
 
 module.exports = findApp;
 
@@ -10,6 +11,8 @@ function findApp () {
   var args = arguments;
   var opts = {};
   var callback;
+
+  /* Overloading */
 
   // findApp(manifestURL [, client])
   if (typeof args[0] == 'string') {
@@ -28,12 +31,15 @@ function findApp () {
     callback = args[args.length-1];
   }
 
-  return start(opts)
-    .then(function(client) {
-      opts.client = client;
+  /* Options*/
+  var keepAlive = opts.client ? true : false;
 
+  var simulator;
+  return Connect(__.extend(opts, {connect: true}))
+    .then(function(sim) {
+      simulator = sim;
       var manifestJSON = getManifest(opts.manifestURL);
-      var webapps = getWebapps(client);
+      var webapps = getWebapps(simulator.client);
       var apps = webapps.then(getInstalledApps);
 
       var appManifest = Q.all([manifestJSON, apps]).spread(findAppManifest);
@@ -64,6 +70,9 @@ function findApp () {
       return result;
     })
     .then(function(styles) {
+      if (!keepAlive) {
+        simulator.client.disconnect();
+      }
       if (callback) callback(null, styles);
       return styles;
     });
@@ -103,14 +112,4 @@ function findAppManifest(manifest, apps) {
     }
   }
   throw new Error("App not found");
-}
-
-if (require.main === module) {
-  (function() {
-
-    findApp('/Users/mozilla/Desktop/nicola/manifest.webapp', function(err, result){
-      console.log("Connected and disconnected", result);
-    }).done();
-
-  })();
 }
