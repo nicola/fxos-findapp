@@ -7,74 +7,41 @@ var __ = require('underscore');
 
 module.exports = findApp;
 
-function findApp () {
-  var args = arguments;
-  var opts = {};
-  var callback;
+function findApp (opts, callback) {
 
-  /* Overloading */
+  opts = opts ? __.clone(opts) : {};
 
-  // findApp(manifestURL [, client])
-  if (typeof args[0] == 'string') {
-    opts.manifestURL = args[0];
-    if (args[1] instanceof FirefoxClient) {
-      opts.client = args[1];
-    }
-  }
-  // findApp({manifestURL: manifest_path[, client: firefox_client]})
-  else if (typeof args[0] == 'object') {
-    opts = args[0];
-  }
+  var manifestJSON = getManifest(opts.manifestURL);
+  var webapps = getWebapps(opts.client);
+  var apps = webapps.then(getInstalledApps);
 
-  // findApp(..., callback)
-  if (typeof args[args.length-1] == 'function') {
-    callback = args[args.length-1];
-  }
+  var appManifest = Q.all([manifestJSON, apps]).spread(findAppManifest);
+  var appActor = appManifest.then(function(app) {
+    return webapps.then(getApp(app.manifestURL));
+  });
 
-  /* Options*/
-  var keepAlive = opts.client ? true : false;
+  // Fulfilling the appManifest means that the app is installed
+  // Fulfilling the appActor means that the app is running
+  return Q.allSettled([appManifest, appActor])
+    .spread(function(manifest, actor) {
 
-  var simulator;
-  return Connect(__.extend(opts, {connect: true}))
-    .then(function(sim) {
-      simulator = sim;
-      var manifestJSON = getManifest(opts.manifestURL);
-      var webapps = getWebapps(simulator.client);
-      var apps = webapps.then(getInstalledApps);
+      // No manifest means no app installed
+      if (manifest.state == 'rejected') {
+        throw manifest.reason;
+      }
 
-      var appManifest = Q.all([manifestJSON, apps]).spread(findAppManifest);
-      var appActor = appManifest.then(function(app) {
-        return webapps.then(getApp(app.manifestURL));
-      });
+      var result = {};
 
-      // Fulfilling the appManifest means that the app is installed
-      // Fulfilling the appActor means that the app is running
-      var result = Q.allSettled([appManifest, appActor])
-        .spread(function(manifest, actor) {
+      if (actor.state == 'fulfilled') {
+        result = actor.value;
+      }
 
-          // No manifest means no app installed
-          if (manifest.state == 'rejected') {
-            throw manifest.reason;
-          }
-
-          var result = {};
-
-          if (actor.state == 'fulfilled') {
-            result = actor.value;
-          }
-
-          result.manifest = manifest.value;
-          return result;
-        });
-
+      result.manifest = manifest.value;
       return result;
     })
-    .then(function(styles) {
-      if (!keepAlive) {
-        simulator.client.disconnect();
-      }
-      if (callback) callback(null, styles);
-      return styles;
+    .then(function(app) {
+      if (callback) callback(null, app);
+      return app;
     });
 }
 
