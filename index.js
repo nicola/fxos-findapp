@@ -5,9 +5,9 @@ var fs = require('fs');
 var path = require('path');
 var __ = require('underscore');
 
-module.exports = findApp;
+module.exports = FindApp;
 
-function findApp (opts, callback) {
+function FindApp (opts, callback) {
 
   opts = opts ? __.clone(opts) : {};
 
