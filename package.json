@@ -1,6 +1,6 @@
 {
   "name": "fxos-findapp",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Find a particular app amongst the installed one in FirefoxOS",
   "main": "index.js",
   "scripts": {
@@ -18,8 +18,8 @@
   "homepage": "https://github.com/nicola/fxos-findapp",
   "dependencies": {
     "firefox-client": "^0.3.0",
-    "fxos-connect": "^0.2.0",
-    "fxos-start": "^0.2.0",
+    "fxos-connect": "^0.3.0",
+    "fxos-start": "^0.3.0",
     "q": "^1.0.1",
     "underscore": "^1.7.0"
   },
