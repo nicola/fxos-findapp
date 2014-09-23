@@ -3,11 +3,13 @@ var should = require("should");
 var FindApp = require("../");
 var Ports = require("fx-ports");
 var Start = require("fxos-start");
+var Deploy = require("fxos-deploy/command");
 var Q = require('q');
 
 
 describe('fxos-findapp', function(){
   this.timeout(10000);
+
   afterEach(function() {
     Ports({b2g:true}, function(err, instances) {
       instances.forEach(function(i) {
@@ -19,8 +21,12 @@ describe('fxos-findapp', function(){
   describe('when no open simulator', function(){
 
     it('should find app manifest', function(done) {
-      FindApp({
-          manifestURL: './test/sampleapp/manifest.webapp'
+      Start({connect:true, force: true})
+        .then(function(sim) {
+          return FindApp({
+            manifestURL: './test/sampleapp/manifest.webapp',
+            client: sim.client
+          });
         })
         .then(function(app) {
           app.manifest.should.be.ok;
@@ -31,8 +37,12 @@ describe('fxos-findapp', function(){
     });
 
     it('should throw error if not existing', function(done) {
-      FindApp({
-          manifestURL: './test/sampleapp/fake.webapp'
+      Start({connect:true, force: true})
+        .then(function(sim) {
+          return FindApp({
+            manifestURL: './test/sampleapp/fake.webapp',
+            client: sim.client
+          });
         })
         .fail(function(err) {
           err.should.be.ok;
@@ -45,8 +55,9 @@ describe('fxos-findapp', function(){
         .then(function(sim) {
 
           return FindApp({
-              manifestURL: './test/sampleapp/manifest.webapp'
-            }, sim)
+              manifestURL: './test/sampleapp/manifest.webapp',
+              client: sim.client
+            })
             .then(function(app) {
               app.manifest.should.be.ok;
               app.manifest.name.should.be.type('string');

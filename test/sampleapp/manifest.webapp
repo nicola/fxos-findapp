@@ -1,6 +1,6 @@
 {
   "version": "0.1.0",
-  "name": "fxos-deploy-sample",
+  "name": "fxos-findapp-sample",
   "description": "Sample app",
   "launch_path": "/index.html",
   "icons": {
