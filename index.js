@@ -39,10 +39,7 @@ function FindApp (opts, callback) {
       result.manifest = manifest.value;
       return result;
     })
-    .then(function(app) {
-      if (callback) callback(null, app);
-      return app;
-    });
+    .nodeify(callback);
 }
 
 function getLocalPath(styleActor) {
